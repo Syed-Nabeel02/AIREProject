@@ -5,31 +5,44 @@ from docxtpl import DocxTemplate
 from pathlib import Path
 import numpy as np
 
+"""
+    1.Template Word file (fixed)
+    2.Operation plan Excel file (prompt)
+    ->
+    1.'OUTPUT' folder - Several filled template files for each item in an Operational plan Excel file worksheet (RUN or GROW or TRANSFORM)
+    2.'NEWER OUTPUT' folder - empty
+"""
 
-def letter(s):
-    if s == "RUN":
-        return "R"
-    elif s == "GROW":
-        return "G"
-    elif s == "TRANSFORM":
-        return "T"
-    else:
-        exit()
+def read_data(sheet_name):
+    """
+    Read data from a file.
+    
+    Parameters
+    ----------
+    sheet_name : str
 
-
-def read_data(s_name):
+    Returns
+    -------
+    df : pandas.DataFrame
+    """
     base_dir = Path(__file__).parent
+
     word_template_path = base_dir / "EA Engagement Self-Assessment Template v0.6.docx"
     excel_path = base_dir / input("Please Enter Operational Plan document name: ")
+
     output_dir = base_dir / "OUTPUT"
     output_dir2 = base_dir / "NEWER OUTPUT"
+
     today = datetime.now()
     date_time = today.strftime("%m/%d/%Y, %H:%M:%S")
+
     # CREATE OUTPUT FOLDER FOR WORD DOCS
     # exists_ok is for just in case a folder with that name exists already
+
     output_dir.mkdir(exist_ok=True)
     output_dir2.mkdir(exist_ok=True)
-    df = pd.read_excel(excel_path, sheet_name=s_name)
+
+    df = pd.read_excel(excel_path, sheet_name)
     for record in df.to_dict(orient="records")[:]:
         doc = DocxTemplate(word_template_path)
         doc.render(record)
@@ -39,10 +52,10 @@ def read_data(s_name):
         ItemCol = record['WorkItemName']
         BranchColumn = record['AccountableBranch'][-6:]
         if record['MustDoCantFail'] == 'Yes':
-            name = f"{IDColumn}{'-'}{BranchColumn}{'-'}{'MDCF'}{'-'}{letter(s_name)}{'-'}{InitColumn}{'-'}{ItemCol}.docx"
+            name = f"{IDColumn}{'-'}{BranchColumn}{'-'}{'MDCF'}{'-'}{sheet_name[0]}{'-'}{InitColumn}{'-'}{ItemCol}.docx"
             output_path = output_dir / name
         else:
-            name = f"{IDColumn}{'-'}{BranchColumn}{'-'}{letter(s_name)}{'-'}{InitColumn}{'-'}{ItemCol}.docx"
+            name = f"{IDColumn}{'-'}{BranchColumn}{'-'}{sheet_name[0]}{'-'}{InitColumn}{'-'}{ItemCol}.docx"
             output_path = output_dir / name
         if not os.path.isfile(output_path):
             # If file does not exist, save to output path, this line allows for copies to not be made when ran
@@ -74,9 +87,14 @@ def read_data(s_name):
 
 if __name__ == '__main__':
     print("Welcome")
-    sheet_name = input("Please enter sheet name:")
+    sheet_name = input("Please enter sheet name (RUN/GROW/TRANSFORM):")
+    sheet_name = sheet_name.upper()
+
     read_data(sheet_name)
-    print("finish generate")
+    
+    print("----------------------------------------")
+    print("File generation completed. Check the OUTPUT folder.")
+
     # print("Please select one of the options below")
     # print("Enter either 1,2 or 3")
     # print("Option 1: Auto-generate Forms?")
