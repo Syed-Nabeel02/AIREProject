@@ -19,7 +19,7 @@ import json
 
 records = []
 
-def open_home_menu():
+def open_home_menu() -> str:
     print("""
     _______
    /      /,
@@ -37,6 +37,11 @@ def open_home_menu():
 ====================\\|//====================
                 dwb `---`
     """)
+
+    sheet_name = input("Please enter sheet name (RUN/GROW/TRANSFORM):")
+    sheet_name = sheet_name.upper()
+
+    return sheet_name
 
 def fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime):
     """
@@ -165,10 +170,8 @@ def get_statistics():
 
 
 if __name__ == '__main__':
-    open_home_menu()
 
-    sheet_name = input("Please enter sheet name (RUN/GROW/TRANSFORM):")
-    sheet_name = sheet_name.upper()
+    sheet_name = open_home_menu()
 
     print("""
        __..._   _...__
