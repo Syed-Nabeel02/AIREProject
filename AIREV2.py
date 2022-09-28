@@ -12,6 +12,7 @@ from difflib import SequenceMatcher
 
     open_home_menu() -> None
     generate_pre_agp_0_report() -> None
+    generate_agp_0_report() -> None
     get_assessment_data() -> list
     get_similarity(rubric_text: str, rationale_text: str) -> float
     get_rubric_descriptions() -> list
@@ -27,7 +28,7 @@ def open_home_menu() -> None:
     _______
    /      /,
   / AIRE //
- /__V_2_//
+ /__V2__//
 (______(/
     """)
     print("WELCOME TO OUR ARCHITECTURE INTAKE REVIEW ENGINE BOT!")
@@ -60,6 +61,7 @@ def open_home_menu() -> None:
         print("--- In Development ---")
         input("Press enter to exit")
         exit()
+        generate_agp_0_report()
     else:
         exit()
 
@@ -77,6 +79,12 @@ def generate_pre_agp_0_report() -> None:
     corporate_or_cluster = assessment_data[3]
 
     fill_in_template(initiative_name, attribute_levels, risk_score, rationales, corporate_or_cluster)
+
+def generate_agp_0_report() -> None:
+    print("1.Input a zip file of all artifact and supplement files (decision matrix, PAQ, SAS and etc)")
+    print("2.Input a template file")
+    print("3.Fill in the template with the files in the zip file")
+    print("4.Save the filled template file")
 
 def get_assessment_data() -> list:
     """
@@ -175,11 +183,11 @@ def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: i
     output_dir.mkdir(exist_ok=True)
     word_doc = base_dir / "Architecture Intake Review Engine Report Draft.docx"
     doc = DocxTemplate(word_doc)
+
     if risk_score < 7:
         gov = 'does not'
     else:
         gov = 'does'
-
     rubric_descriptions = get_rubric_descriptions() 
     business_scopes_rubrics = [rubric_descriptions[0], rubric_descriptions[1], rubric_descriptions[2]]
     it_solution_rubrics = [rubric_descriptions[3], rubric_descriptions[4], rubric_descriptions[5]]
@@ -215,9 +223,9 @@ def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: i
                's4': str(round((get_similarity(info_sensitivy_rubrics[get_attribute_score(attribute_levels[4])], rationales[4]) * 100), 2)) + '%',
                }
 
-    check_file_exist('demo1.docx')
-
     doc.render(context)
+
+    check_file_exist('demo1.docx')
 
     output_path = output_dir / "generated_doc.docx"
     doc.save(output_path)
