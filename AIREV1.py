@@ -9,12 +9,20 @@ from pprint import pprint
 import json
 
 """
-    Fill in intake forms for other branches
-    1.Template Word file (fixed)
-    2.Operation plan Excel file (prompt)
-    ->
-    1.'OUTPUT' folder - Several filled template files for each item in an Operational plan Excel file worksheet (RUN or GROW or TRANSFORM)
-    2.'NEWER OUTPUT' folder - empty
+Creates an output folder and many intake form Word files with proper names based on an operational plan Excel file. 
+
+1.Template Word file (fixed)
+2.Operation plan Excel file (prompt)
+->
+1.'OUTPUT' folder - Several filled template files for each item in an Operational plan Excel file worksheet (RUN or GROW or TRANSFORM)
+2.'NEWER OUTPUT' folder - empty
+
+Methods
+- open_home_menu() -> str
+- fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime) -> DocxTemplate
+- generate_file_name(record: dict, sheet_name: str) -> str
+- generate_templates(sheet_name: str) -> None
+- get_statistics() -> None
 """
 
 records = []
@@ -43,7 +51,7 @@ def open_home_menu() -> str:
 
     return sheet_name
 
-def fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime):
+def fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime) -> DocxTemplate:
     """
     Fill in the template with an item's details
     """
@@ -123,7 +131,7 @@ def generate_templates(sheet_name: str) -> None:
 
     return
 
-def get_statistics():
+def get_statistics() -> None:
     statistics_all = []
 
     for record in records:

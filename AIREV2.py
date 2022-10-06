@@ -8,19 +8,24 @@ import openpyxl
 from difflib import SequenceMatcher
 
 """
-    Fill in the report for us
+Creates a report Word file based on a rubric Excel file. 
 
-    open_home_menu() -> None
-    generate_pre_agp_0_report() -> None
-    generate_agp_0_report() -> None
-    get_assessment_data() -> list
-    get_similarity(rubric_text: str, rationale_text: str) -> float
-    get_rubric_descriptions() -> list
-    get_today_date_time() -> datetime
-    get_risk_level(risk_score: int) -> str
-    get_attribute_score(attribute_level: str) -> int
-    fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None
-    check_file_exist(file_name: str) -> None
+Methods
+- open_home_menu() -> None
+- generate_pre_agp_0_report() -> None
+- generate_agp_0_report() -> None
+- get_assessment_data() -> list
+- get_similarity(rubric_text: str, rationale_text: str) -> float
+- get_rubric_descriptions() -> list
+- get_today_date_time() -> datetime
+- get_risk_level(risk_score: int) -> str
+- get_attribute_score(attribute_level: str) -> int
+- fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None
+- check_file_exist(file_name: str) -> None
+- generate_output_folder() -> None:
+- generate_output_template(output_template_name: str) -> DocxTemplate:
+- save_output_template(doc: DocxTemplate) -> None:
+- open_output_template() -> None:
 """
 # this  function welcomes the user to the program
 def open_home_menu() -> None:
@@ -82,7 +87,15 @@ def generate_pre_agp_0_report() -> None:
 
 def generate_agp_0_report() -> None:
     print("1.Input a zip file of all artifact and supplement files (decision matrix, PAQ, SAS and etc)")
+
     print("2.Input a template file")
+    rubric_descriptions = get_rubric_descriptions() 
+    business_scopes_rubrics = [rubric_descriptions[0], rubric_descriptions[1], rubric_descriptions[2]]
+    it_solution_rubrics = [rubric_descriptions[3], rubric_descriptions[4], rubric_descriptions[5]]
+    technology_upgrade_rubrics = [rubric_descriptions[6], rubric_descriptions[7], rubric_descriptions[8]]
+    info_requirements_rubrics = [rubric_descriptions[9], rubric_descriptions[10], rubric_descriptions[11]]
+    info_sensitivy_rubrics = [rubric_descriptions[12], rubric_descriptions[13], rubric_descriptions[14]]
+
     print("3.Fill in the template with the files in the zip file")
     print("4.Save the filled template file")
 
@@ -97,7 +110,7 @@ def get_assessment_data() -> list:
 
     wb = openpyxl.load_workbook(excel_path, data_only=True)
     sheet = wb['Matrix']
-
+    
     attribute_levels = [sheet['D10'].value, sheet['D11'].value, sheet['D12'].value, sheet['D13'].value, sheet['D14'].value]
     risk_score = sheet['D15'].value
     rationales = [sheet['C10'].value, sheet['C11'].value, sheet['C12'].value, sheet['C13'].value, sheet['C14'].value]
@@ -109,7 +122,7 @@ def get_assessment_data() -> list:
 
 def get_similarity(rubric_text: str, rationale_text: str) -> float:
     """
-    Get the text similarity between the rubric text and input text
+    Get the text similarity ratio between the rubric text and input text
     """
     return SequenceMatcher(None, rubric_text, rationale_text).ratio()
 
@@ -173,21 +186,43 @@ def check_file_exist(file_name: str) -> None:
     else:
         print(file_name, ' file does not exist')
 
+def generate_output_folder() -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Output"
+    output_dir.mkdir(exist_ok=True)
+
+def generate_output_template(output_template_name: str) -> DocxTemplate:
+    base_dir = Path(__file__).parent
+    word_doc = base_dir / output_template_name
+    doc = DocxTemplate(word_doc)
+    return doc
+
+def save_output_template(doc: DocxTemplate) -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Output"
+    output_path = output_dir / "generated_doc.docx"
+    doc.save(output_path)
+
+def open_output_template() -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Output"
+    output_path = output_dir / "generated_doc.docx"
+    os.system("start " + str(output_path))
+
 # this function should take in the array of rubric descriptions and user input arrays
 # based on the arrays, an appropriate set of results and conclusion should be reached
 # report should open automatically (probably remind the users to save the generated report)
 def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None:
 
-    base_dir = Path(__file__).parent
-    output_dir = base_dir / "Output"
-    output_dir.mkdir(exist_ok=True)
-    word_doc = base_dir / "Architecture Intake Review Engine Report Draft.docx"
-    doc = DocxTemplate(word_doc)
+    generate_output_folder()
+
+    doc = generate_output_template("Architecture Intake Review Engine Report Draft.docx")
 
     if risk_score < 7:
         gov = 'does not'
     else:
         gov = 'does'
+
     rubric_descriptions = get_rubric_descriptions() 
     business_scopes_rubrics = [rubric_descriptions[0], rubric_descriptions[1], rubric_descriptions[2]]
     it_solution_rubrics = [rubric_descriptions[3], rubric_descriptions[4], rubric_descriptions[5]]
@@ -227,10 +262,9 @@ def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: i
 
     check_file_exist('demo1.docx')
 
-    output_path = output_dir / "generated_doc.docx"
-    doc.save(output_path)
+    save_output_template(doc)
 
-    os.system("start " + str(output_path))
+    open_output_template()
 
 # # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
