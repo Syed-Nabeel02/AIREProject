@@ -9,41 +9,82 @@ from pprint import pprint
 import json
 
 """
-    Fill in intake forms for other branches
-    1.Template Word file (fixed)
-    2.Operation plan Excel file (prompt)
-    ->
-    1.'OUTPUT' folder - Several filled template files for each item in an Operational plan Excel file worksheet (RUN or GROW or TRANSFORM)
-    2.'NEWER OUTPUT' folder - empty
+Creates an output folder and many intake form Word files with proper names based on an operational plan Excel file. 
+
+1.Template Word file (fixed)
+2.Operation plan Excel file (prompt)
+->
+1.'OUTPUT' folder - Several filled template files for each item in an Operational plan Excel file worksheet (RUN or GROW or TRANSFORM)
+2.'NEWER OUTPUT' folder - empty
+
+Methods
+- open_home_menu() -> str
+- fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime) -> DocxTemplate
+- generate_file_name(record: dict, sheet_name: str) -> str
+- generate_templates(sheet_name: str) -> None
+- get_statistics() -> None
 """
 
 records = []
 
-def open_home_menu() -> str:
-    print("""
-    _______
-   /      /,
-  / AIRE //
- /__V1__//
-(______(/
-    """)
+def generate_templates(sheet_name: str) -> None:
+    """
+    Generate Word template files from an Excel file.
+    
+    Parameters
+    ----------
+    sheet_name : str
 
-    print("""
-    __...--~~~~~-._   _.-~~~~~--...__
-    //   RUN         `V'  TRANSFORM    \\ 
-   //    GROW         |                 \\ 
-  //__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
- //__.....----~~~~._\ | /_.~~~~----.....__\\
-====================\\|//====================
-                dwb `---`
-    """)
+    Returns
+    -------
+    df : pandas.DataFrame
+    """
 
-    sheet_name = input("Please enter sheet name (RUN/GROW/TRANSFORM):")
-    sheet_name = sheet_name.upper()
+    base_dir = Path(__file__).parent
 
-    return sheet_name
+    word_template_path = base_dir / "Early_Engagement" / "EA Engagement Self-Assessment Template v0.6.docx"
+    excel_path = base_dir / "Early_Engagement" / "CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx"
 
-def fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime):
+    # CREATE OUTPUT FOLDER FOR WORD DOCS
+    # exists_ok is for just in case a folder with that name exists already
+    output_dir = base_dir / "Output" # Early_Engagement_Output and EarlyEngagementOutput cause error
+    output_dir.mkdir(exist_ok=True)
+
+    today = datetime.now()
+    date_time = today.strftime("%m/%d/%Y, %H:%M:%S")
+
+    df = pd.read_excel(excel_path, sheet_name) # many items as a dataframe
+    item_number = len(df.index)
+
+    print("-------------------------- Start ---------------------------------")
+
+    for index, record in enumerate(df.to_dict(orient="records")[:]): # for each item
+
+        # 1.Generate and fill in a template for an item
+        doc = DocxTemplate(word_template_path)
+        doc = fill_in_template(doc, record, date_time)
+
+        # 2.Generate a name for the template
+        name = generate_file_name(record, sheet_name)
+
+        # 3.Save the template at the correct directory
+        output_path = output_dir / name
+        if not os.path.isfile(output_path):
+            # If file does not exist, save to output path, this line allows for copies to not be made when ran
+            name = "NEW-" + name
+            output_path = output_dir / name
+            doc.save(output_path) # ***
+        else: # if the file already exists, do not save the file
+            continue
+
+        # 4.Save records for get_statistics
+        records.append(record)
+
+    open_output_folder()
+    
+    print("-------------------------- Complete ---------------------------------")
+
+def fill_in_template(doc: DocxTemplate, record:dict, date_time: datetime) -> DocxTemplate:
     """
     Fill in the template with an item's details
     """
@@ -65,158 +106,7 @@ def generate_file_name(record: dict, sheet_name: str) -> str:
         name = f"{IDColumn}{'-'}{BranchColumn}{'-'}{sheet_name[0]}{'-'}{InitColumn}{'-'}{ItemCol}.docx"
     return name
 
-def generate_templates(sheet_name: str) -> None:
-    """
-    Generate Word template files from an Excel file.
-    
-    Parameters
-    ----------
-    sheet_name : str
-
-    Returns
-    -------
-    df : pandas.DataFrame
-    """
-
+def open_output_folder() -> None:
     base_dir = Path(__file__).parent
-
-    word_template_path = base_dir / "EA Engagement Self-Assessment Template v0.6.docx"
-    excel_path = base_dir / "CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx"
-
-    # CREATE OUTPUT FOLDER FOR WORD DOCS
-    # exists_ok is for just in case a folder with that name exists already
-    output_dir = base_dir / "OUTPUT"
-    output_dir2 = base_dir / "NEWER OUTPUT"
-    output_dir.mkdir(exist_ok=True)
-    output_dir2.mkdir(exist_ok=True)
-
-    today = datetime.now()
-    date_time = today.strftime("%m/%d/%Y, %H:%M:%S")
-
-    df = pd.read_excel(excel_path, sheet_name) # many items as a dataframe
-    item_number = len(df.index)
-
-    with alive_bar(item_number, bar="fish") as bar:
-        for index, record in enumerate(df.to_dict(orient="records")[:]): # for each item
-
-            # 1.Generate and fill in a template for an item
-            doc = DocxTemplate(word_template_path)
-            doc = fill_in_template(doc, record, date_time)
-
-            # 2.Generate a name for the template
-            name = generate_file_name(record, sheet_name)
-
-            # 3.Save the template at the correct directory
-            output_path = output_dir / name
-            if not os.path.isfile(output_path):
-                # If file does not exist, save to output path, this line allows for copies to not be made when ran
-                name = "NEW-" + name
-                output_path = output_dir / name
-                doc.save(output_path) # ***
-            else: # if the file already exists, do not save the file
-                continue
-
-            # 4.Save records for get_statistics
-            records.append(record)
-
-            bar()
-
-    return
-
-def get_statistics():
-    statistics_all = []
-
-    for record in records:
-        statistics = {}
-        missing_items = ""
-        missing_items_num = 0
-
-        statistics["Branch"] = record['AccountableBranch']
-        statistics["Intiative"] = record['Initiative']
-
-        for key, value in record.items():
-            if type(value) is not str:
-                missing_items = missing_items + key + ","
-                missing_items_num += 1
-
-        statistics["missing_items_num"] = missing_items_num
-        statistics["missing_items"] = missing_items
-
-        statistics_all.append(statistics)
-
-    pprint(statistics_all)
-
-    json_file = open("AIREV1_Statistics.json", "w")
-    json.dump(statistics_all, json_file)
-    json_file.close()
-
-#
-# def compare():
-#     base_dir = Path(__file__).parent
-#     excel_path = base_dir / "CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx"
-#     excel_path2 = base_dir / input("enter new operational plan name:")
-#     output_dir = base_dir / "New Output"
-#     output_dir.mkdir(exist_ok=True)
-#     df = pd.read_excel(excel_path, sheet_name="RUN")
-#     df1 = pd.read_excel(excel_path2, sheet_name="RUN")
-#     # print(df.equals(df1))
-#     comparison_values = df.values == df1.values
-#     #print(comparison_values)
-#     rows, cols = np.where(comparison_values == False)
-#     for item in zip(rows,cols):
-#         df.iloc[item[0], item[1]] = '{} --> {}'.format(df.iloc[item[0], item[1]], df1.iloc[item[0], item[1]])
-#     df.to_excel('GenerateComparisonDoc.xlsx', index=False, header=True)
-#     return
-
-
-if __name__ == '__main__':
-
-    sheet_name = open_home_menu()
-
-    print("""
-       __..._   _...__
-  _..-"      `Y`      "-._
-  \ Once upon |           /
-   \\  a time..|          //
-   \\\         |         ///
-    \\\ _..---.|.---.._ ///
- jgs \\`_..---.Y.---.._`//
-     '`               `'
-    """)
-
-    generate_templates(sheet_name)
-
-    get_statistics()
-    
-    print("----------------------------------------")
-    print("""
-             .--.           .---.        .-.
-         .---|--|   .-.     | A |  .---. |~|    .--.
-      .--|===|Ch|---|_|--.__| S |--|:::| |~|-==-|==|---.
-      |%%|NT2|oc|===| |~~|%%| C |--|   |_|~|CATS|  |___|-.
-      |  |   |ah|===| |==|  | I |  |:::|=| |    |GB|---|=|
-      |  |   |ol|   |_|__|  | I |__|   | | |    |  |___| |
-      |~~|===|--|===|~|~~|%%|~~~|--|:::|=|~|----|==|---|=|
-hjw   ^--^---'--^---^-^--^--^---'--^---^-^-^-==-^--^---^-'
-    """)
-    print("File generation completed. Check the OUTPUT folder.")
-
-
-
-    # print("Please select one of the options below")
-    # print("Enter either 1,2 or 3")
-    # print("Option 1: Auto-generate Forms?")
-    # print("Option 2: Compare Forms?")
-    # print("Option 3: Do you want to exit the menu?")
-    # option = input()
-    # while int(option) < 1 or int(option) > 3:
-    #     option = input("Please enter a valid response: ")
-    # if int(option) == 1:
-    #     sheet_name = input("Please enter sheet name:")
-    #     generate_templates(sheet_name)
-    #     print("finish generate")
-    # elif int(option) == 2:
-    #     compare()
-    #     print("finish compare")
-    # else:
-    #     exit()
+    output_dir = base_dir / "Output"
+    os.system("start " + str(output_dir))

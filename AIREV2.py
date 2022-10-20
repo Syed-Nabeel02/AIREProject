@@ -6,72 +6,40 @@ import os
 from pathlib import Path
 import openpyxl
 from difflib import SequenceMatcher
+from pprint import pprint
+import zipfile
 
 """
-    Fill in the report for us
+1) Pre-AGP0: Creates a report Word file based on a rubric Excel file. 
+2) AGP0: Submit a zip file of supplement files and check whether all requirements are met.
 
-    open_home_menu() -> None
-    generate_pre_agp_0_report() -> None
-    generate_agp_0_report() -> None
-    get_assessment_data() -> list
-    get_similarity(rubric_text: str, rationale_text: str) -> float
-    get_rubric_descriptions() -> list
-    get_today_date_time() -> datetime
-    get_risk_level(risk_score: int) -> str
-    get_attribute_score(attribute_level: str) -> int
-    fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None
-    check_file_exist(file_name: str) -> None
+Methods
+- open_home_menu() -> None
+
+- generate_pre_agp_0_report() -> None
+- get_assessment_data() -> list
+- get_similarity(rubric_text: str, rationale_text: str) -> float
+- get_rubric_descriptions() -> list
+- get_today_date_time() -> datetime
+- get_risk_level(risk_score: int) -> str
+- get_attribute_score(attribute_level: str) -> int
+- fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None
+- check_file_exist(file_name: str) -> None
+- generate_output_folder() -> None:
+- generate_output_template(output_template_name: str) -> DocxTemplate:
+- save_output_template(doc: DocxTemplate) -> None:
+- open_output_template() -> None:
+
+- generate_agp_0_report() -> None
+- extract_zip_file(zip_file_name: str) -> None
+- get_file_names_in_folder() -> list
+- organize_files_by_type(file_names) -> tuple
 """
-# this  function welcomes the user to the program
-def open_home_menu() -> None:
-    print("""
-    _______
-   /      /,
-  / AIRE //
- /__V2__//
-(______(/
-    """)
-    print("WELCOME TO OUR ARCHITECTURE INTAKE REVIEW ENGINE BOT!")
-    input("Press enter to continue :)")
 
-    invalid = True
-    answer = 0
 
-    while invalid:
-        print("""
-    __...--~~~~~-._   _.-~~~~~--...__
-    //  1.Pre AGP 0  `V'   3.Exit      \\ 
-   //  2.AGP 0        |                 \\ 
-  //__...--~~~~~~-._  |  _.-~~~~~~--...__\\ 
- //__.....----~~~~._\ | /_.~~~~----.....__\\
-====================\\|//====================
-                dwb `---`
-""")
-        print("Please select which task you'd like to perform:\n")
-        print("1. Pre AGP 0 Assessment: Use I&IT Decision Matrix to better assess a project item")
-        print("2. AGP 0 Assessment: Ensure all mandatory files are submitted by Project group")
-        print("3. Exit Program")
-        answer = input()
-        if 1 <= int(answer) <= 3:
-            invalid = False
+def generate_pre_agp_0_report(initiative_name, assessment_file_directory) -> None:
 
-    if int(answer) == 1:
-        generate_pre_agp_0_report()
-    elif int(answer) == 2:
-        print("--- In Development ---")
-        input("Press enter to exit")
-        exit()
-        generate_agp_0_report()
-    else:
-        exit()
-
-    return
-
-def generate_pre_agp_0_report() -> None:
-
-    initiative_name = input("What is the initiative name? (any name):")
-    
-    assessment_data = get_assessment_data()
+    assessment_data = get_assessment_data(assessment_file_directory)
 
     attribute_levels = assessment_data[0]
     risk_score = assessment_data[1]
@@ -80,24 +48,17 @@ def generate_pre_agp_0_report() -> None:
 
     fill_in_template(initiative_name, attribute_levels, risk_score, rationales, corporate_or_cluster)
 
-def generate_agp_0_report() -> None:
-    print("1.Input a zip file of all artifact and supplement files (decision matrix, PAQ, SAS and etc)")
-    print("2.Input a template file")
-    print("3.Fill in the template with the files in the zip file")
-    print("4.Save the filled template file")
+    print("-------------------------------------- Complete --------------------------------------")
 
-def get_assessment_data() -> list:
+def get_assessment_data(assessment_file_directory) -> list:
     """
     Get attribute_levels, risk_score, rationales, and corporate_or_cluster from the assessment file
     """
-    filename = input("Please enter the name of the assessment file (userinput.xlsx):")
-
-    base_dir = Path(__file__).parent
-    excel_path = base_dir / filename
+    excel_path = assessment_file_directory
 
     wb = openpyxl.load_workbook(excel_path, data_only=True)
     sheet = wb['Matrix']
-
+    
     attribute_levels = [sheet['D10'].value, sheet['D11'].value, sheet['D12'].value, sheet['D13'].value, sheet['D14'].value]
     risk_score = sheet['D15'].value
     rationales = [sheet['C10'].value, sheet['C11'].value, sheet['C12'].value, sheet['C13'].value, sheet['C14'].value]
@@ -109,7 +70,7 @@ def get_assessment_data() -> list:
 
 def get_similarity(rubric_text: str, rationale_text: str) -> float:
     """
-    Get the text similarity between the rubric text and input text
+    Get the text similarity ratio between the rubric text and input text
     """
     return SequenceMatcher(None, rubric_text, rationale_text).ratio()
 
@@ -124,12 +85,12 @@ def get_rubric_descriptions() -> list:
     info_sensitivy: 12,13,14
     """
     base_dir = Path(__file__).parent
-    # word_doc = base_dir / "Architecture Intake Review Engine Report Draft.docx"
-    output_dir = base_dir / "Output"
+    # word_doc = base_dir / "Pre_AGP0" / "Architecture Intake Review Engine Report Draft.docx"
+    output_dir = base_dir / "Pre_AGP0_Output"
     output_dir.mkdir(exist_ok=True)
     # doc = DocxTemplate(word_doc)
 
-    excel_path = base_dir / "IIT-EA-Decision-Matrix.xlsx"
+    excel_path = base_dir / "Pre_AGP0" / "IIT-EA-Decision-Matrix.xlsx"
     df = pd.read_excel(excel_path, sheet_name="Rubric")
     rubric_descriptions = []
     for record in df.to_dict(orient="records"):
@@ -173,21 +134,43 @@ def check_file_exist(file_name: str) -> None:
     else:
         print(file_name, ' file does not exist')
 
+def generate_output_folder() -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Pre_AGP0_Output"
+    output_dir.mkdir(exist_ok=True)
+
+def generate_output_template(output_template_name: str) -> DocxTemplate:
+    base_dir = Path(__file__).parent
+    word_doc = base_dir / "Pre_AGP0" / output_template_name
+    doc = DocxTemplate(word_doc)
+    return doc
+
+def save_output_template(doc: DocxTemplate) -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Pre_AGP0_Output"
+    output_path = output_dir / "generated_doc.docx"
+    doc.save(output_path)
+
+def open_output_template() -> None:
+    base_dir = Path(__file__).parent
+    output_dir = base_dir / "Pre_AGP0_Output"
+    output_path = output_dir / "generated_doc.docx"
+    os.system("start " + str(output_path))
+
 # this function should take in the array of rubric descriptions and user input arrays
 # based on the arrays, an appropriate set of results and conclusion should be reached
 # report should open automatically (probably remind the users to save the generated report)
 def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None:
 
-    base_dir = Path(__file__).parent
-    output_dir = base_dir / "Output"
-    output_dir.mkdir(exist_ok=True)
-    word_doc = base_dir / "Architecture Intake Review Engine Report Draft.docx"
-    doc = DocxTemplate(word_doc)
+    generate_output_folder()
+
+    doc = generate_output_template("Architecture Intake Review Engine Report Draft.docx")
 
     if risk_score < 7:
         gov = 'does not'
     else:
         gov = 'does'
+
     rubric_descriptions = get_rubric_descriptions() 
     business_scopes_rubrics = [rubric_descriptions[0], rubric_descriptions[1], rubric_descriptions[2]]
     it_solution_rubrics = [rubric_descriptions[3], rubric_descriptions[4], rubric_descriptions[5]]
@@ -225,33 +208,60 @@ def fill_in_template(initiative_name: str, attribute_levels: list, risk_score: i
 
     doc.render(context)
 
-    check_file_exist('demo1.docx')
+    save_output_template(doc)
 
-    output_path = output_dir / "generated_doc.docx"
-    doc.save(output_path)
+    open_output_template()
 
-    os.system("start " + str(output_path))
+def generate_agp_0_report() -> None:
+    print("1.Input a zip file of all artifact and supplement files (decision matrix, PAQ, SAS and etc)")
 
-# # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    open_home_menu()
+    zip_file_name = input("Enter the zip file name (without .zip): ")
+    extract_zip_file(zip_file_name)
 
-    print("----------------------------------------")
-    print("""
-        _________   _________
-   ____/  AIRE   \ /  Report \____
- /| ------------- |  ------------ |\\
-||| ------------- | ------------- |||
-||| ------------- | ------------- |||
-||| ------- ----- | ------------- |||
-||| ------------- | ------------- |||
-||| ------------- | ------------- |||
-|||  ------------ | ----------    |||
-||| ------------- |  ------------ |||
-||| ------------- | ------------- |||
-||| ------------- | ------ -----  |||
-||| ------------  | ------------- |||
-|||_____________  |  _____________|||
-L/_____/--------\\_//W-------\_____\J
-    """)
-    print("File generation completed. Check the OUTPUT folder.")
+    print("2.Check the completeness")
+    file_names = get_file_names_in_folder()
+    word_file_names, excel_file_names, ppt_file_names, pdf_file_names = organize_files_by_type(file_names)
+
+    pprint(word_file_names)
+    pprint(excel_file_names)
+    pprint(ppt_file_names)
+    pprint(pdf_file_names)
+
+def extract_zip_file(zip_file_name: str) -> None:
+    zip_file_name = zip_file_name + ".zip"
+
+    base_dir = Path(__file__).parent
+    path_to_zip_file = base_dir / "Put an AGP0 Supplements zip file here" / zip_file_name
+    directory_to_extract_to = base_dir / "AGP0 Supplements"
+
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
+
+def get_file_names_in_folder() -> list:
+    file_names = []
+    base_dir = Path(__file__).parent
+    directory_to_extract_to = base_dir / "AGP0 Supplements"
+    for path, subdirs, files in os.walk(directory_to_extract_to):
+        for name in files:
+            file_name = Path(os.path.join(path, name)).name
+            file_names.append(file_name)
+    return file_names
+
+def organize_files_by_type(file_names) -> tuple:
+    word_file_names = []
+    excel_file_names = []
+    ppt_file_names = []
+    pdf_file_names = []
+
+    for file_name in file_names:
+        if file_name[-4:] == "docx":
+            word_file_names.append(file_name)
+        elif file_name[-4:] == "xlsx":
+            excel_file_names.append(file_name)
+        elif file_name[-4:] == "pptx":
+            ppt_file_names.append(file_name)
+        elif file_name[-3:] == "pdf":
+            pdf_file_names.append(file_name)
+    
+    return (word_file_names, excel_file_names, ppt_file_names, pdf_file_names)
+
