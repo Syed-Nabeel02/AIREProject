@@ -1,0 +1,263 @@
+ScreenManager:
+    Menu_Screen:
+    Early_Engagement_Screen:
+    Pre_AGP0_Screen:
+    AGP0_Screen:
+    Loading_Screen:
+    Comparison_Screen:
+    Recess_Screen:
+    Info_Screen:
+
+<Menu_Screen>:
+    name: 'menu'
+    MDGridLayout:
+        cols: 2
+        rows: 1
+
+        FitImage:
+            source: 'menu.png'
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            padding: 10
+
+            MDRectangleFlatButton:
+                text: 'Early Engagment'
+                size_hint: (1,1)
+                on_press: root.manager.current = 'early_engagement'
+            MDRectangleFlatButton:
+                text: 'Pre AGP0'
+                size_hint: (1,1)
+                on_press: root.manager.current = 'pre_agp0'
+            MDRectangleFlatButton:
+                text: 'AGP0'
+                size_hint: (1,1)
+                on_press: root.manager.current = 'agp0'
+            MDBoxLayout:
+                spacing: 10
+                MDRectangleFlatButton:
+                    text: 'Comparison'
+                    size_hint: (1,1)
+                    on_press: root.manager.current = 'comparison'
+                MDRectangleFlatButton:
+                    text: '+'
+                    size_hint: (1,1)
+                    on_press: root.manager.current = 'recess'
+                MDRectangleFlatButton:
+                    text: 'Info'
+                    size_hint: (1,1)
+                    on_press: root.manager.current = 'info'
+
+<Early_Engagement_Screen>:
+    name: 'early_engagement'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+        MDBoxLayout:
+            MDLabel:
+                id: directory
+                text: 'Input an operation plan file.'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Choose a file'
+                size_hint: (1,1)
+                on_press: app.select_file()
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                id: sheet_name
+                text: 'Sheet Name?'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Run'
+                size_hint: (1,1)
+                on_press: app.select_run()
+            MDRectangleFlatButton:
+                text: 'Grow'
+                size_hint: (1,1)
+                on_press: app.select_grow()
+            MDRectangleFlatButton:
+                text: 'Transform'
+                size_hint: (1,1)
+                on_press: app.select_transform()
+        MDBoxLayout:
+            spacing: 10
+            MDRectangleFlatButton:
+                text: 'Generate'
+                size_hint: (1,1)
+                on_press: root.manager.current = 'loading'
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint: (1,1)
+            on_press: root.manager.current = 'menu'
+        
+<Pre_AGP0_Screen>:
+    name: 'pre_agp0'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+        MDTextField:
+            id: initiative_name
+            hint_text: "What is the initiative name? (any name)"
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                id: assessment_file_directory
+                text: 'Input an assessment file.'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Choose a file'
+                size_hint: (1,1)
+                on_press: app.select_file_2()
+        MDRectangleFlatButton:
+            text: 'Generate'
+            size_hint: (1,1)
+            on_press: app.pre_agp0_generate()
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint: (1,1)
+            on_press: root.manager.current = 'menu'
+            
+<AGP0_Screen>:
+    name: 'agp0'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                id: agp0_supplements_directory
+                text: 'Input a zip file of AGP0 supplements.'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Choose a file'
+                size_hint: (1,1)
+                on_press: app.select_file_3()
+        MDRectangleFlatButton:
+            text: 'Check'
+            size_hint: (1,1)
+            on_press: app.agp0_generate()
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint: (1,1)
+            on_press: root.manager.current = 'menu'
+
+<Loading_Screen>
+    name: 'loading'
+    on_enter: app.ea_generate()
+    FitImage:
+        source: '3.jpg'
+    FloatLayout:
+        MDIconButton:
+            icon: "keyboard-return"
+            theme_icon_color: "Custom"
+            icon_color: app.theme_cls.primary_color
+            pos: (10,10)
+            on_press: root.manager.current = 'menu'
+        MDLabel:
+            text: "Generating..."
+            halign: 'center'
+            theme_text_color: "Custom"
+            text_color: (1, 1, 1, 1)
+            pos: (50,10)
+            size_hint: (0.15,0.08)
+
+<Comparison_Screen>
+    name: 'comparison'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                id: old_operationa_plan_directory
+                text: 'Input an old operation plan file.'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Choose a file'
+                size_hint: (1,1)
+                on_press: app.select_file_4()
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                id: new_operationa_plan_directory
+                text: 'Input a new operation plan file.'
+                halign: 'center'
+                size_hint: (1,1)
+            MDRectangleFlatButton:
+                text: 'Choose a file'
+                size_hint: (1,1)
+                on_press: app.select_file_5()
+        MDRectangleFlatButton:
+            text: 'Compare'
+            size_hint: (1,1)
+            on_press: app.compare_old_new_operational_plan()
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint: (1,1)
+            on_press: root.manager.current = 'menu'
+
+
+<Recess_Screen>
+    name: 'recess'
+    FitImage:
+        source: '3.jpg'
+    FloatLayout:
+        MDIconButton:
+            icon: "keyboard-return"
+            theme_icon_color: "Custom"
+            icon_color: app.theme_cls.primary_color
+            pos: (10,10)
+            on_press: root.manager.current = 'menu'
+
+<Info_Screen>
+    name: 'info'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 10
+        padding: 10
+        MDLabel:
+            text: 'AIRE (Architecture Intake Review Engine)'
+            halign: 'center'
+            size_hint: (1,1)
+        MDLabel:
+            text: 'version 3.0 alpha'
+            halign: 'center'
+            size_hint: (1,1)
+        MDLabel:
+            text: 'EAO (Enterprise Architecture Office) branch'
+            halign: 'center'
+            size_hint: (1,1)
+        MDBoxLayout:
+            spacing: 10
+            MDLabel:
+                text: 'Developers'
+                halign: 'center'
+                size_hint: (1,1)
+            MDLabel:
+                text: 'Arielle Ramgoolie'
+                halign: 'center'
+                size_hint: (1,1)
+            MDLabel:
+                text: 'Abdullahi Hassan'
+                halign: 'center'
+                size_hint: (1,1)
+            MDLabel:
+                text: 'Dongwon Lee'
+                halign: 'center'
+                size_hint: (1,1)
+        MDRectangleFlatButton:
+            text: 'Back'
+            size_hint: (1,1)
+            on_press: root.manager.current = 'menu'
+
+
