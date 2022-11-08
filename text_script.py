@@ -16,7 +16,53 @@ import re
 # paragraph_f.style = doc.styles['Footer']# this is what changes the style
 
 # doc.save('test_file.docx')
+# On the pdf format, I tested three approaches:
 
+
+
+
+
+# 1) using API
+# 2) converting.txt files from PDF
+# 3) Making use of the pdfpy library
+
+
+
+
+
+# I can confirm that none of these deliver the optimal results.
+
+
+
+
+
+# --------------------------------------------------------------------
+
+
+
+
+
+# With regard to the docx file, I used the docx library framework in Python, and I think it looks good.
+
+
+
+
+
+# 1) It can create a new footer for the file, but it cannot search for 'Queen'.
+# 2) In the paragraph(body) part of the file, it will replace the Queen word with 'King',
+# and hence replacement works
+
+
+
+
+
+# ---------------------------------------------------------------------------
+
+
+
+
+
+Additionally, I am also exploring another approach that makes use of the C#.NET Framework.
 
 
 
