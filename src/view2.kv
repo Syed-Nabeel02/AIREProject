@@ -1,0 +1,117 @@
+ScreenManager:
+    Main_Screen:
+
+<Main_Screen>:
+    name: "main"
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'background.jpg'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.5
+
+            MDBoxLayout:
+                size_hint: 1, 0.2
+            MDBoxLayout:
+                size_hint: 1, 0.6
+                MDBoxLayout:
+                MDLabel:
+                    id: title
+                    text: "AIRE"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    font_style: "H2"
+                MDBoxLayout:
+
+            MDGridLayout:
+                size_hint: 1, 2
+                cols: 3
+                padding: 30
+                spacing: 20
+
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "Early Engagement"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "Pre-AGP0"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "AGP0"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "OP Comparison"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "Info"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDCard:
+                    elevation: 3
+                    radius: [12,]
+                    orientation: 'vertical'
+                    ripple_behavior: True
+                    FitImage:
+                        source: "1.png"
+                        size_hint: 1, 2
+                        radius: [12,12,0,0]
+                    MDLabel:
+                        text: "Exit"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                

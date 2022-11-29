@@ -1,0 +1,187 @@
+ScreenManager:
+    Main_Screen:
+    EA_Screen:
+
+<Main_Screen>:
+    name: "main"
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'background.jpg'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.5
+
+            MDBoxLayout:
+                size_hint: 1, 0.2
+            MDBoxLayout:
+                MDBoxLayout:
+                MDLabel:
+                    id: title
+                    text: "AIRE"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    font_style: "H2"
+                MDBoxLayout:
+        MDBoxLayout:
+            MDBoxLayout:
+            MDStackLayout:
+                orientation: "tb-rl"
+                padding: 10
+                spacing: 15
+                MDFillRoundFlatIconButton:
+                    text: "Early Engagement"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'ea'
+                MDFillRoundFlatIconButton:
+                    text: "Pre-AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                MDFillRoundFlatIconButton:
+                    text: "AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                MDFillRoundFlatIconButton:
+                    text: "OP Comparison"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                MDFillRoundFlatIconButton:
+                    text: "Info"
+                    icon: "information-outline"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                MDFillRoundFlatIconButton:
+                    text: "Exit"
+                    icon: "exit-run"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+            MDBoxLayout:
+
+
+<EA_Screen>:
+    name: "ea"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                padding: 10
+                MDLabel:
+                    text: "Operation Plan file"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDFillRoundFlatIconButton:
+                    text: "File"
+                    icon: "file"
+                    size_hint: 0.5, 0.5
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    theme_icon_color: "Custom"
+                    icon_color: "white"
+                    font_style: "Subtitle1"
+                    md_bg_color: 1,0,0,.3
+            MDBoxLayout:
+                MDLabel:
+                    text: "Sheet name"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDCheckbox:
+                    active: True
+                    group: "group"
+                MDLabel:
+                    text: "RUN"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDCheckbox:
+                    group: "group"
+                MDLabel:
+                    text: "GROW"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDCheckbox:
+                    group: "group"
+                MDLabel:
+                    text: "TRANSFORM"
+                    halign: 'center'
+                    color: 1,0,0,.6
+            MDFillRoundFlatIconButton:
+                text: "Write"
+                icon: "fountain-pen-tip"
+                size_hint: 0.3, 0.3
+                pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                theme_text_color: "Custom"
+                text_color: "white"
+                theme_icon_color: "Custom"
+                icon_color: "white"
+                font_style: "Subtitle1"
+                md_bg_color: 1,0,0,.3
+            MDFillRoundFlatIconButton:
+                text: "Return"
+                icon: "home"
+                size_hint: 0.3, 0.3
+                pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                theme_text_color: "Custom"
+                text_color: "white"
+                theme_icon_color: "Custom"
+                icon_color: "white"
+                font_style: "Subtitle1"
+                md_bg_color: 1,0,0,.3
