@@ -1,0 +1,439 @@
+ScreenManager:
+    Main_Screen:
+    EA_Screen:
+    Pre_AGP0_Screen
+    AGP0_Screen
+    Info_Screen
+
+<Main_Screen>:
+    name: "main"
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './resources/background.jpg'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.5
+
+            MDBoxLayout:
+                size_hint: 1, 0.2
+            MDBoxLayout:
+                MDBoxLayout:
+                MDLabel:
+                    id: title
+                    text: "AIRE"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    font_style: "H2"
+                MDBoxLayout:
+        MDBoxLayout:
+            MDBoxLayout:
+            MDStackLayout:
+                orientation: "tb-rl"
+                padding: 10
+                spacing: 15
+                MDFillRoundFlatIconButton:
+                    text: "Early Engagement"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'early_engagment'
+                MDFillRoundFlatIconButton:
+                    text: "Pre-AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'pre_agp0'
+                MDFillRoundFlatIconButton:
+                    text: "AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'agp0'
+                MDFillRoundFlatIconButton:
+                    text: "Info"
+                    icon: "information-outline"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'info'
+                MDFillRoundFlatIconButton:
+                    text: "Exit"
+                    icon: "exit-run"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+            MDBoxLayout:
+
+
+<EA_Screen>:
+    name: "early_engagment"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './resources/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Operation Plan file"
+                        halgin: "center"
+                        size_hint: 0.8, 1
+                        color: 1,0,0,.6
+                    MDFillRoundFlatIconButton:
+                        text: "File"
+                        icon: "file"
+                        size_hint: 0.5, 0.6
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: app.get_operational_plan_path()
+                MDBoxLayout:
+            MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.25, 1
+                    MDLabel:
+                        text: "Sheet name"
+                        halign: 'center'
+                        color: 1,0,0,.6
+                MDBoxLayout:
+                    spacing: 10
+                    MDBoxLayout:
+                        size_hint: 1, 0.8
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        radius: [6,]
+                        md_bg_color: 1,0,0,.05
+                        MDCheckbox:
+                            pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                            size_hint: 1, 0.5
+                            active: True
+                            group: "group"
+                            on_press: app.set_sheet_name_run()
+                        MDLabel:
+                            size_hint: 2, 1
+                            text: "RUN"
+                            halign: 'center'
+                            color: 1,0,0,.6
+                    MDBoxLayout:
+                        size_hint: 1, 0.8
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        radius: [6,]
+                        md_bg_color: 1,0,0,.05
+                        MDCheckbox:
+                            pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                            size_hint: 1, 0.5
+                            group: "group"
+                            on_press: app.set_sheet_name_grow()
+                        MDLabel:
+                            size_hint: 2, 1
+                            text: "GROW"
+                            halign: 'center'
+                            color: 1,0,0,.6
+                    MDBoxLayout:
+                        size_hint: 1, 0.8
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        radius: [6,]
+                        md_bg_color: 1,0,0,.05
+                        MDCheckbox:
+                            pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                            size_hint: 1, 0.5
+                            group: "group"
+                            on_press: app.set_sheet_name_transform()
+                        MDLabel:
+                            size_hint: 2, 1
+                            text: "TRANSFORM"
+                            halign: 'center'
+                            color: 1,0,0,.6
+            MDBoxLayout:
+                MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.6, 0.6
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Write"
+                        icon: "fountain-pen-tip"
+                        size: self.parent.size
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: app.run_early_engagement_module()
+                MDBoxLayout:
+            MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.2, 0.4
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Return"
+                        icon: "home"
+                        size: self.parent.size
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: root.manager.current = 'main'
+                MDBoxLayout:
+
+<Pre_AGP0_Screen>:
+    name: "pre_agp0"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './resources/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                padding: 10
+                size_hint: 1, 0.3
+            MDBoxLayout:
+                padding: 10
+                size_hint: 1, 0.3
+                MDLabel:
+                    text: "Assessment file"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDFillRoundFlatIconButton:
+                    text: "File"
+                    icon: "file"
+                    size_hint: 0.5, 0.8
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    theme_icon_color: "Custom"
+                    icon_color: "white"
+                    font_style: "Subtitle1"
+                    md_bg_color: 1,0,0,.3
+                    on_press : app.get_assessment_file_path()
+            MDBoxLayout:
+                size_hint: 0.2, 0.5
+                pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                MDFillRoundFlatIconButton:
+                    text: "Write"
+                    icon: "fountain-pen-tip"
+                    size_hint: 0.3, 0.4
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    theme_icon_color: "Custom"
+                    icon_color: "white"
+                    font_style: "Subtitle1"
+                    md_bg_color: 1,0,0,.3
+                    on_press: app.run_pre_agp0_module()
+            MDBoxLayout:
+                size_hint: 1, 0.3
+                MDBoxLayout:
+                    size_hint: 0.2, 0.5
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Return"
+                        icon: "home"
+                        size: self.parent.size
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: root.manager.current = 'main'
+                MDBoxLayout:
+
+<AGP0_Screen>:
+    name: "agp0"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './resources/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                padding: 10
+                MDLabel:
+                    text: "Requirements"
+                    halign: 'center'
+                    color: 1,0,0,.6
+                MDFillRoundFlatIconButton:
+                    text: "File"
+                    icon: "file"
+                    size_hint: 0.5, 0.5
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    theme_icon_color: "Custom"
+                    icon_color: "white"
+                    font_style: "Subtitle1"
+                    md_bg_color: 1,0,0,.3
+                    on_press: app.get_agp0_file_path()
+            MDBoxLayout:
+                size_hint: 0.2, 1
+                pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                MDFillRoundFlatIconButton:
+                    text: "Check"
+                    icon: "fountain-pen-tip"
+                    size_hint: 0.3, 0.4
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    theme_icon_color: "Custom"
+                    icon_color: "white"
+                    font_style: "Subtitle1"
+                    md_bg_color: 1,0,0,.3
+                    on_press: app.run_agp0_module()
+            MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.2, 0.4
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Return"
+                        icon: "home"
+                        size: self.parent.size
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: root.manager.current = 'main'
+                MDBoxLayout:
+
+<Info_Screen>:
+    name: "info"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './resources/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                MDLabel:
+                    text:"AIRE version 3 beta"
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    font_style: "H5"
+            MDBoxLayout:
+                orientation: 'vertical'
+                MDBoxLayout:
+                    md_bg_color: 1,0,0,.1
+                    radius: [12,]
+                    MDLabel: 
+                        text: "Developers"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                MDBoxLayout:
+                    MDLabel: 
+                        text: "Arielle Ramgoolie"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Abdullahi Hassan"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Dongwon Lee"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Mohammed Sohail"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+            MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.2, 0.4
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Return"
+                        icon: "home"
+                        size: self.parent.size
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: root.manager.current = 'main'
+                MDBoxLayout:
