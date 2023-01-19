@@ -22,6 +22,10 @@ class early_engagement():
         pprint(self.data)
         return self
 
+    def end_test(self):
+        print("************ Success *****************")
+        return self
+
     def add_prev_op_path(self):
         path_to_prev_op = self.get_prev_op_path()
         self.data['path_to_prev_op'] = path_to_prev_op
@@ -46,8 +50,10 @@ class early_engagement():
         return path_to_prev_op
 
     def archive_curr_op(self):
+        # validate_path_to_curr_op()
         if(self.data['path_to_curr_op'] == None):
-            raise Exception('archive_curr_op: No path_to_curr_op in the data')
+            raise Exception('!Error - archive_curr_op: No path_to_curr_op in the data')
+
         path_to_curr_op = self.data['path_to_curr_op']
         path_to_archive = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'archive'
         current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -57,15 +63,19 @@ class early_engagement():
         return self
 
     def add_prev_curr_op_df(self):
+        # validate_path_to_curr_op()
         if(self.data['path_to_curr_op'] == None):
-            raise Exception('add_prev_curr_op_df: No path_to_curr_op in the data')
+            raise Exception('!Error - add_prev_curr_op_df: No path_to_curr_op in the data')
+        # validate_path_to_prev_op()            
         if(self.data['path_to_prev_op'] == None):
-            raise Exception('add_prev_curr_op_df: No path_to_prev_op in the data')
+            raise Exception('!Error - add_prev_curr_op_df: No path_to_prev_op in the data')
 
+        # add_dataframes_from_prev_op_run_grow_transform()
         self.data['prev_op_run_df'] = pd.read_excel(self.data['path_to_prev_op'], sheet_name='RUN')
         self.data['prev_op_grow_df'] = pd.read_excel(self.data['path_to_prev_op'], sheet_name='GROW')
         self.data['prev_op_transform_df'] = pd.read_excel(self.data['path_to_prev_op'], sheet_name='TRANSFORM')
 
+        # add_dataframes_from_curr_op_run_grow_transform()
         self.data['curr_op_run_df'] = pd.read_excel(self.data['path_to_curr_op'], sheet_name='RUN')
         self.data['curr_op_grow_df'] = pd.read_excel(self.data['path_to_curr_op'], sheet_name='GROW')
         self.data['curr_op_transform_df'] = pd.read_excel(self.data['path_to_curr_op'], sheet_name='TRANSFORM')
@@ -73,28 +83,33 @@ class early_engagement():
         return self
 
     def add_prev_curr_op_comparison(self):
+        # validate_isPrev()
         if(self.data['isPrev'] == None):
             raise Exception("add_prev_curr_op_comparison: There is no isPrev in the data.")
         if(self.data['isPrev'] == False):
             self.data['comparison'] = None
             return self.data
             
+        # validate prev_op_dataframes()
         if(self.data['prev_op_run_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no prev_op_run_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no prev_op_run_df in the data.")
         if(self.data['prev_op_grow_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no prev_op_grow_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no prev_op_grow_df in the data.")
         if(self.data['prev_op_transform_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no prev_op_transform_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no prev_op_transform_df in the data.")
+        
+        # validate curr_op_dataframes()
         if(self.data['curr_op_run_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no curr_op_run_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no curr_op_run_df in the data.")
         if(self.data['curr_op_grow_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no curr_op_grow_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no curr_op_grow_df in the data.")
         if(self.data['curr_op_transform_df'].equals(None)):
-            raise Exception("add_prev_curr_op_comparison: There is no curr_op_transform_df in the data.")
+            raise Exception("!Error - add_prev_curr_op_comparison: There is no curr_op_transform_df in the data.")
 
         prev_op_run_df = self.data['prev_op_run_df']
         prev_op_grow_df = self.data['prev_op_grow_df']
         prev_op_transform_df = self.data['prev_op_transform_df']
+
         curr_op_run_df = self.data['curr_op_run_df']
         curr_op_grow_df = self.data['curr_op_grow_df']
         curr_op_transform_df = self.data['curr_op_transform_df']
@@ -106,6 +121,7 @@ class early_engagement():
         comparison['areTransformSame'] = prev_op_transform_df.equals(curr_op_transform_df)
 
         if(comparison['areRunSame'] == False):
+            # add_run_change_indexes()
             run_change_df = prev_op_run_df.eq(curr_op_run_df)
             comparison['run_change_df'] = run_change_df
             change_locs = run_change_df.eq(False)
@@ -113,6 +129,7 @@ class early_engagement():
             comparison['run_change_indexes'] = change_indexes
 
         if(comparison['areGrowSame'] == False):
+            # add_grow_change_indexes()
             grow_change_df = prev_op_grow_df.eq(curr_op_grow_df)
             comparison['grow_change_df'] = grow_change_df 
             change_locs = grow_change_df.eq(False)
@@ -120,6 +137,7 @@ class early_engagement():
             comparison['grow_change_indexes'] = change_indexes
 
         if(comparison['areTransformSame'] == False):
+            # add_transform_change_indexes()
             transform_change_df = prev_op_transform_df.eq(curr_op_transform_df)
             comparison['transform_change_df'] = transform_change_df
             change_locs = transform_change_df.eq(False)
@@ -142,10 +160,10 @@ class early_engagement():
 
         return self
 
-# if __name__ == '__main__':
-#     # For testing purpose
-#     path_to_curr_op = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx'
-#     try:
-#         early_engagement(path_to_curr_op).add_prev_op_path().add_prev_curr_op_df().add_prev_curr_op_comparison().print_data().save_excel()
-#     except Exception as e:
-#         print(str(e))
+if __name__ == '__main__':
+    # For testing purpose
+    path_to_curr_op = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx'
+    try:
+        early_engagement(path_to_curr_op).add_prev_op_path().add_prev_curr_op_df().add_prev_curr_op_comparison().print_data().end_test()
+    except Exception as e:
+        print(str(e))
