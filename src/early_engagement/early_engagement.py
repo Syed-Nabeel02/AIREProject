@@ -2,210 +2,257 @@ from pathlib import Path
 import shutil
 from datetime import datetime
 import os
-import pandas as pd
 from pprint import pprint 
 from docx import Document
+import pandas
+import openpyxl
+from openpyxl.styles import PatternFill
+
+# terms
+#
+# op: operational plan
+# shutil: shell utilities
+# os: operating system
 
 class early_engagement():
 
-    def __init__(self, path_to_current_op = None):
+    path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement' 
+    path_to_intake_forms = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'intake forms'
+    path_to_archive = Path().absolute() / 'data' / 'archive' / 'early_engagement'
+
+    def __init__(self, path_to_current_op):
+        """
+        1. Receives a path to an operational plan file
+        2. Initializes [data] dictionary variable
+        3. Put current datetime into [data]
+        4. Copy the received operational plan file to the output folder
+        5. Put the path to the operational plan file in the output folder into [data]
+        """
+        print("__init__ starts")
+
+        if path_to_current_op == None:
+            raise Exception('!!! __init__: No path_to_current_op argument given')
+
         self.data = {}
-        self.data['path_to_current_op'] = path_to_current_op
 
-    def add_previous_op_path(self):
-        path_to_previous_op = self.get_previous_op_path()
-        self.data['path_to_previous_op'] = path_to_previous_op
-        
-        if(path_to_previous_op == None):
-            self.data['archive_exists'] = False
+        self.data['current_datetime'] = self.get_current_datetime()
+
+        shutil.copyfile(path_to_current_op, self.path_to_output / "current_op.xlsx")
+        self.data['path_to_current_op'] = self.path_to_output / "current_op.xlsx"
+
+        print("__init__ finished")
+
+    def check_first_run(self):
+        """
+        1. Check whether there was a previous run by checking the archive folder
+        """
+        print("check_first_run starts")
+
+        if(self.is_first_run()):
+            self.data['is_first_run'] = True
         else:
-            self.data['archive_exists'] = True
+            self.data['is_first_run'] = False
+
+        print("check_first_run finished")
+
+        return self;
+
+    def add_previous_op_to_output_folder(self):
+        """
+        1. Copy the previous operational plan file in the archive folder into the output folder
+        2. Add the path to the previous operational plan file in the output folder to [data]
+        """
+        print("add_previous_op_to_output_folder starts")
+
+        if(self.data['is_first_run'] == True):
+            return self
+
+        shutil.copyfile(self.path_to_archive / "previous_op.xlsx", self.path_to_output / "previous_op.xlsx")
+        self.data['path_to_previous_op'] = self.path_to_output / "previous_op.xlsx"
+
+        print("add_previous_op_to_output_folder finished")
 
         return self
 
-    def archive_current_op(self):
-        self.validate_path_to_current_op()
+   
+    def compare_current_previous_op(self):
+        """
+        1. Compare the previous and current operational plans 
+        2. Initializes [comparison] dictionary variable
+        2. Put comparison results (same or not, changed cell location and values if there is any) into [comparison]
+        3. Put [comparison] into [data]
+        """
+        print("compare_current_previous_op starts")
 
-        path_to_current_op = self.data['path_to_current_op']
-        path_to_archive = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'archive'
-        current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        curr_op_archive_name = current_date_time + '.xlsx'
-        curr_op_archive_name = curr_op_archive_name.replace('-', '').replace(':','').replace(' ','_')     # replace - and : due to file name format error
-        shutil.copyfile(path_to_current_op, path_to_archive / curr_op_archive_name)
-
-        return self
-
-    def add_dataframes(self):
-        self.validate_path_to_current_op()
-        self.validate_path_to_previous_op()            
-
-        self.add_dataframes_from_prev_op_run_grow_transform()
-        self.add_dataframes_from_curr_op_run_grow_transform()
-
-        return self
-
-    def add_comparison(self):
-        self.validate_archive_exists()
-
-        if(self.data['archive_exists'] == False):
-            self.data['comparison'] = None
-            return self.data
-            
-        self.validate_previous_op_dataframes() 
-        self.validate_current_op_dataframes()
-
-        prev_op_run_df = self.data['prev_op_run_df']
-        prev_op_grow_df = self.data['prev_op_grow_df']
-        prev_op_transform_df = self.data['prev_op_transform_df']
-
-        curr_op_run_df = self.data['curr_op_run_df']
-        curr_op_grow_df = self.data['curr_op_grow_df']
-        curr_op_transform_df = self.data['curr_op_transform_df']
+        if(self.data['is_first_run']):
+            return self
 
         comparison = {}
 
-        comparison['areRunSame'] = prev_op_run_df.equals(curr_op_run_df)
-        comparison['areGrowSame'] = prev_op_grow_df.equals(curr_op_grow_df)
-        comparison['areTransformSame'] = prev_op_transform_df.equals(curr_op_transform_df)
+        comparison['are_run_same'] = self.are_previous_current_sheets_same('RUN')
+        comparison['are_grow_same'] = self.are_previous_current_sheets_same('GROW')
+        comparison['are_transform_same'] = self.are_previous_current_sheets_same('TRANSFORM')
 
-        if(comparison['areRunSame'] == False):
-            # add_run_changed_indexes()
-            run_change_df = prev_op_run_df.eq(curr_op_run_df)
-            comparison['run_change_df'] = run_change_df
-            change_locs = run_change_df.eq(False)
-            change_indexes = change_locs[change_locs].stack().index.tolist()
-            comparison['run_change_indexes'] = change_indexes
-
-        if(comparison['areGrowSame'] == False):
-            # add_grow_change_indexes()
-            grow_change_df = prev_op_grow_df.eq(curr_op_grow_df)
-            comparison['grow_change_df'] = grow_change_df 
-            change_locs = grow_change_df.eq(False)
-            change_indexes = change_locs[change_locs].stack().index.tolist()
-            comparison['grow_change_indexes'] = change_indexes
-
-        if(comparison['areTransformSame'] == False):
-            # add_transform_change_indexes()
-            transform_change_df = prev_op_transform_df.eq(curr_op_transform_df)
-            comparison['transform_change_df'] = transform_change_df
-            change_locs = transform_change_df.eq(False)
-            change_indexes = change_locs[change_locs].stack().index.tolist()
-            comparison['transform_change_indexes'] = change_indexes
+        if(comparison['are_run_same'] == False):
+            comparison['changes_in_run_sheet'] = self.compare_previous_current_sheets_of('RUN')
+        if(comparison['are_grow_same'] == False):
+            comparison['changes_in_grow_sheet'] = self.compare_previous_current_sheets_of('GROW')
+        if(comparison['are_transform_same'] == False):
+            comparison['changes_in_transform_sheet'] = self.compare_previous_current_sheets_of('TRANSFORM')
 
         self.data['comparison'] = comparison
 
-        return self
-
-    def save_excel(self):
-        path_to_changes = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'changes'
-
-        if(self.data['comparison']['runChanges'] != None):
-            self.data['comparison']['runChanges'].to_excel(path_to_changes / "runChanges.xlsx")
-        if(self.data['comparison']['growChanges'] != None):
-            self.data['comparison']['growChanges'].to_excel(path_to_changes / "growChanges.xlsx")
-        if(self.data['comparison']['transformChanges'] != None):
-            self.data['comparison']['transformChanges'].to_excel(path_to_changes / "transformChanges.xlsx")
+        print("compare_current_previous_op finished")
 
         return self
+        
+    def generate_comparison_report(self):
+        """
+        1. Generate a Word Document object
+        2. Iterate through [data] to put information into the Word Document object
+        3. Save the Word Document object as a Word file in the output folder.
+        """
+        print("generate_comparison_report starts")
 
-    def print_data(self):
-        pprint(self.data)
-        return self
+        if(self.data['is_first_run']):
+            return self
 
-    def save_data_to_file(self):
         doc = Document()
-        path_to_data = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'data.docx'
         for key, value in self.data.items():
             doc.add_paragraph(f'{key}: {value}')
-            doc.add_paragraph("-------------------------------------------------------")
-        doc.save(path_to_data)
-        return self
+            doc.add_paragraph("--------------------------------------------------------------------------------")
+        comparison_report_name = "Comparison_Report_" + self.data['current_datetime'].replace('-', '').replace(':','').replace(' ','_') + ".docx"
+        doc.save(self.path_to_output / comparison_report_name)
 
-    # TBD
-    # def generate_comparison_report():
-    # def generate_excel_comparison_report():
-    # def generate_word_comparison_report():
-    # def generate_intake_forms():
-    # def generate_intake_form():
-
-    # ----------------- helper methods -----------------------
-
-    def get_previous_op_path(self):
-        path_to_archive = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'archive'
-        file_names = []
-        for path, subdirs, files in os.walk(path_to_archive):
-            for name in files:
-                file_name = Path(os.path.join(path, name))
-                file_names.append(file_name)
-        if(len(file_names) == 0):
-            return None
-        file_names.sort()
-        path_to_previous_op = file_names[-1]
-
-        return path_to_previous_op
-
-    def add_dataframes_from_prev_op_run_grow_transform(self):
-        self.data['prev_op_run_df'] = pd.read_excel(self.data['path_to_previous_op'], sheet_name='RUN')
-        self.data['prev_op_grow_df'] = pd.read_excel(self.data['path_to_previous_op'], sheet_name='GROW')
-        self.data['prev_op_transform_df'] = pd.read_excel(self.data['path_to_previous_op'], sheet_name='TRANSFORM')
-
-        return self;
-
-    def add_dataframes_from_curr_op_run_grow_transform(self):
-        self.data['curr_op_run_df'] = pd.read_excel(self.data['path_to_current_op'], sheet_name='RUN')
-        self.data['curr_op_grow_df'] = pd.read_excel(self.data['path_to_current_op'], sheet_name='GROW')
-        self.data['curr_op_transform_df'] = pd.read_excel(self.data['path_to_current_op'], sheet_name='TRANSFORM')
-
-        return self;
-
-    def validate_archive_exists(self):
-        if(self.data['archive_exists'] == None):
-            raise Exception("add_comparison: There is no archive_exists in the data.")
-
-        return self;
-
-    def validate_previous_op_dataframes(self):
-        if(self.data['prev_op_run_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no prev_op_run_df in the data.")
-        if(self.data['prev_op_grow_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no prev_op_grow_df in the data.")
-        if(self.data['prev_op_transform_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no prev_op_transform_df in the data.")
-  
-        return self;
-
-    def validate_current_op_dataframes(self):
-        if(self.data['curr_op_run_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no curr_op_run_df in the data.")
-        if(self.data['curr_op_grow_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no curr_op_grow_df in the data.")
-        if(self.data['curr_op_transform_df'].equals(None)):
-            raise Exception("!Error - add_comparison: There is no curr_op_transform_df in the data.")
+        print("generate_comparison_report finished")
 
         return self
 
-    def validate_path_to_current_op(self):
-        if(self.data['path_to_current_op'] == None):
-            raise Exception('!Error - add_dataframes: No path_to_current_op in the data')
+    def generate_comparison_tables(self):
+        """
+        1. Make a copy of the current operational plan file to use it to describe the changed cells
+        2. If one of the sheets (RUN/GROW/TRANSFORM) are changed, compare the previous and current operational plan files of the changed sheet, highlight the changed cells,and write both previous and current values in the copied file
+        """
+        if(self.data['is_first_run']):
+            return self
+
+        comparison_tables_name = "Comparison_Tables_" + self.data['current_datetime'].replace('-', '').replace(':','').replace(' ','_') + ".xlsx"
+        path_to_comparison_tables = self.path_to_output / comparison_tables_name
+        shutil.copyfile(self.data['path_to_current_op'], path_to_comparison_tables)
+
+        if(self.data['comparison']['are_run_same'] == False):
+            self.generate_comparison_table_of('RUN', path_to_comparison_tables)
+        if(self.data['comparison']['are_grow_same'] == False):
+            self.generate_comparison_table_of('GROW', path_to_comparison_tables)
+        if(self.data['comparison']['are_transform_same'] == False):
+            self.generate_comparison_table_of('TRANSFORM', path_to_comparison_tables)
+
+        return self
+
+    # To Be Developed
+    def generate_intake_forms(self):
+        if not os.path.exists(self.path_to_intake_forms):
+            os.makedirs(self.path_to_intake_forms)
 
         return self;
 
-    def validate_path_to_previous_op(self):
-        if(self.data['path_to_previous_op'] == None):
-            raise Exception('!Error - add_dataframes: No path_to_previous_op in the data')
+    def archive_files(self):
+        """
+        1. Make a zip file of the output folder and put it in the data/archive folder
+        2. Save the current operational plan file in the data/archive folder for the next run (will be used as a previous operational plan)
+        """
+        print("archive_files starts")
+        
+        shutil.copyfile(self.path_to_output / "current_op.xlsx", self.path_to_archive / "previous_op.xlsx")
+   
+        archive_name = self.format_datetime_string(self.data['current_datetime'])
+        shutil.make_archive(self.path_to_archive / archive_name, 'zip', self.path_to_output)
 
-        return self;
+        print("archive_files finished")
+     
+        return self
 
-    def validate_path_to_current_op(self):
-        if(self.data['path_to_current_op'] == None):
-            raise Exception('!Error - archive_current_op: No path_to_current_op in the data')
+    def clear_output_folder(self):
+        """
+        1. Delete all the files in the output folder for the next run
+        """
+        print("clear_output_folder starts")
+
+        for root, dirs, files in os.walk(self.path_to_output):
+            for file in files:
+                os.unlink(os.path.join(root, file))
+            for dir in dirs:
+                os.rmdir(os.path.join(root, dir))
+
+        print("clear_output_folder finished")
+
+        return self
+
+    
+
+    # ----------------------------- helper methods -----------------------------
+
+    def is_first_run(self):
+        if not os.path.exists(self.path_to_archive):
+            return True
+        if len(os.listdir(self.path_to_archive)) == 0:
+            return True
+        return False
+
+    def get_current_datetime(self):
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def format_datetime_string(self, datetime_string):
+        # replace - and : to solve file name format error
+        return datetime_string.replace('-', '').replace(':','').replace(' ','_') 
+
+    def are_previous_current_sheets_same(self, sheet_name):
+        previous_sheet_dataframe = pandas.read_excel(self.data['path_to_previous_op'], sheet_name=sheet_name)
+        current_sheet_dataframe = pandas.read_excel(self.data['path_to_current_op'], sheet_name=sheet_name)
+        return previous_sheet_dataframe.equals(current_sheet_dataframe)
+
+    def compare_previous_current_sheets_of(self, sheet_name):
+        changes = []
+
+        previous_op_workbook = openpyxl.load_workbook(self.data['path_to_previous_op'])
+        current_op_workbook = openpyxl.load_workbook(self.data['path_to_current_op'])
+
+        previous_sheet = previous_op_workbook[sheet_name]
+        current_sheet = current_op_workbook[sheet_name]
+
+        for row in range(1, current_sheet.max_row):
+            for col in range(1, current_sheet.max_column):
+                if previous_sheet.cell(row, col).value != current_sheet.cell(row, col).value:
+                    changes.append((row, col, previous_sheet.cell(row, col).value, current_sheet.cell(row, col).value))
+
+        return changes
+
+    def generate_comparison_table_of(self, sheet_name, path_to_comparison_tables):
+
+        previous_op_workbook = openpyxl.load_workbook(self.data['path_to_previous_op'])
+        current_op_workbook = openpyxl.load_workbook(self.data['path_to_current_op'])
+        comparison_result_workbook = openpyxl.load_workbook(path_to_comparison_tables)
+
+        previous_sheet = previous_op_workbook[sheet_name]
+        current_sheet = current_op_workbook[sheet_name]
+        comparison_result_sheet = comparison_result_workbook[sheet_name]
+
+        for row in range(1, current_sheet.max_row):
+            for col in range(1, current_sheet.max_column):
+                if previous_sheet.cell(row, col).value != current_sheet.cell(row, col).value:
+                    comparison_result_sheet.cell(row, col).value = '{} --> {}'.format(previous_sheet.cell(row, col).value, current_sheet.cell(row, col).value)
+                    comparison_result_sheet.cell(row, col).fill = PatternFill(start_color="A8F3FF", fill_type = "solid")
+
+        comparison_result_workbook.save(path_to_comparison_tables)
 
         return self
 
 if __name__ == '__main__':
     # For testing purpose
     path_to_current_op = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022.xlsx'
+    path_to_changed_op = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022 - old.xlsx'
+    
     try:
-        early_engagement(path_to_current_op).add_previous_op_path().add_dataframes().add_comparison().save_data_to_file()
+        early_engagement(path_to_current_op).check_first_run().add_previous_op_to_output_folder().compare_current_previous_op().generate_comparison_report().generate_comparison_tables().generate_intake_forms().archive_files().clear_output_folder()
     except Exception as e:
-        print(str(e))
+        print(e)
