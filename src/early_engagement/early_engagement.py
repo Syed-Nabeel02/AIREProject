@@ -4,9 +4,11 @@ from datetime import datetime
 import os
 from pprint import pprint 
 from docx import Document
+from docxtpl import DocxTemplate
 import pandas
 import openpyxl
 from openpyxl.styles import PatternFill
+from concurrent.futures import ThreadPoolExecutor
 
 # terms
 #
@@ -16,8 +18,9 @@ from openpyxl.styles import PatternFill
 
 class early_engagement():
 
+    path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'EA Engagement Self-Assessment Template v0.6.docx'
     path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement' 
-    path_to_intake_forms = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'intake forms'
+    path_to_intake_form_folder = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'intake forms'
     path_to_archive = Path().absolute() / 'data' / 'archive' / 'early_engagement'
 
     def __init__(self, path_to_current_op):
@@ -36,6 +39,7 @@ class early_engagement():
         self.data = {}
 
         self.data['current_datetime'] = self.get_current_datetime()
+        self.data['original_path_to_current_op'] = path_to_current_op
 
         shutil.copyfile(path_to_current_op, self.path_to_output / "current_op.xlsx")
         self.data['path_to_current_op'] = self.path_to_output / "current_op.xlsx"
@@ -133,6 +137,8 @@ class early_engagement():
         1. Make a copy of the current operational plan file to use it to describe the changed cells
         2. If one of the sheets (RUN/GROW/TRANSFORM) are changed, compare the previous and current operational plan files of the changed sheet, highlight the changed cells,and write both previous and current values in the copied file
         """
+        print("generate_comparison_table starts")
+
         if(self.data['is_first_run']):
             return self
 
@@ -147,12 +153,23 @@ class early_engagement():
         if(self.data['comparison']['are_transform_same'] == False):
             self.generate_comparison_table_of('TRANSFORM', path_to_comparison_tables)
 
+        print("generate_comparison_table finished")
+
         return self
 
-    # To Be Developed
     def generate_intake_forms(self):
-        if not os.path.exists(self.path_to_intake_forms):
-            os.makedirs(self.path_to_intake_forms)
+        print("generate_intake_forms starts")
+
+        if not os.path.exists(self.path_to_intake_form_folder):
+            os.makedirs(self.path_to_intake_form_folder)
+
+        for sheet_name in ["RUN", "GROW", "TRANSFORM"]:
+            dataframe = pandas.read_excel(self.data['path_to_current_op'], sheet_name)
+            intake_form_count = len(dataframe.index)
+            for index, record in enumerate(dataframe.to_dict(orient="records")[:]): # for each operational plan item
+                self.generate_intake_form(record, sheet_name, index, intake_form_count)
+
+        print("generate_intake_forms finished")
 
         return self;
 
@@ -178,11 +195,8 @@ class early_engagement():
         """
         print("clear_output_folder starts")
 
-        for root, dirs, files in os.walk(self.path_to_output):
-            for file in files:
-                os.unlink(os.path.join(root, file))
-            for dir in dirs:
-                os.rmdir(os.path.join(root, dir))
+        shutil.rmtree(self.path_to_output)
+        os.makedirs(self.path_to_output)
 
         print("clear_output_folder finished")
 
@@ -246,6 +260,55 @@ class early_engagement():
         comparison_result_workbook.save(path_to_comparison_tables)
 
         return self
+
+    def generate_intake_form(self, record, sheet_name, index, intake_form_count):
+        print(int(index)+1, "/", intake_form_count,  "started")
+
+        doc = DocxTemplate(self.path_to_intake_form_template)
+        intake_form_name = self.generate_intake_form_name(record, sheet_name)
+        doc = self.fill_in_intake_form(doc, record, intake_form_name)
+
+        path_to_intake_form = self.path_to_intake_form_folder / intake_form_name
+
+        if not os.path.isfile(path_to_intake_form):
+            intake_form_name = "NEW_" + intake_form_name
+            path_to_intake_form = self.path_to_intake_form_folder / intake_form_name
+            doc.save(path_to_intake_form) 
+
+    def generate_intake_form_name(self, record: dict, sheet_name: str) -> str:
+        """
+        1. Generate an intake form file name based on the item's details and sheet_name
+        """
+        IDColumn = record['ID']
+        InitColumn = record['Initiative']
+        ItemCol = record['WorkItemName']
+        BranchColumn = record['AccountableBranch'][-6:]
+
+        if(isinstance(IDColumn, str)):
+            InitColumn = InitColumn.strip()
+        if(isinstance(ItemCol, str)):
+            ItemCol = ItemCol.strip()
+        if(isinstance(BranchColumn, str)):
+            BranchColumn = BranchColumn.strip()
+
+        if record['MustDoCantFail'] == 'Yes':
+            intake_form_name = f"{IDColumn}{'_'}{BranchColumn}{'_'}{'MDCF'}{'_'}{sheet_name[0]}{'_'}{InitColumn}{'_'}{ItemCol}"
+        else:
+            intake_form_name = f"{IDColumn}{'_'}{BranchColumn}{'_'}{sheet_name[0]}{'_'}{InitColumn}{'_'}{ItemCol}"
+        
+        intake_form_name = intake_form_name.replace(' ', '').replace('-', '').replace('.', '') + ".docx"
+        
+        return intake_form_name
+
+    def fill_in_intake_form(self, doc: DocxTemplate, record:dict, intake_form_name: str) -> DocxTemplate:
+        """
+        1. Fill in the template with received item's details
+        2. Record current datetime and intake form name for tracking (solution branches might change intake forms' name)
+        """
+        doc.render(record) 
+        doc.add_paragraph("This was Autogenerated on" + " " + self.data['current_datetime'])
+        doc.add_paragraph("Do not modify:" + intake_form_name)
+        return doc
 
 if __name__ == '__main__':
     # For testing purpose

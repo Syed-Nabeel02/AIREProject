@@ -1,0 +1,471 @@
+ScreenManager:
+    Main_Screen:
+    EA_Screen:
+    Pre_AGP0_Screen
+    AGP0_Screen
+    Info_Screen
+
+<Main_Screen>:
+    name: "main"
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './data/kivymd/background.jpg'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.5
+
+            MDBoxLayout:
+                size_hint: 1, 0.2
+            MDBoxLayout:
+                MDBoxLayout:
+                MDLabel:
+                    id: title
+                    text: "AIRE"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: "white"
+                    font_style: "H2"
+                MDBoxLayout:
+        MDBoxLayout:
+            MDBoxLayout:
+            MDStackLayout:
+                orientation: "tb-rl"
+                padding: 10
+                spacing: 15
+                MDFillRoundFlatIconButton:
+                    text: "Early Engagement"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'early_engagment'
+                MDFillRoundFlatIconButton:
+                    text: "Pre-AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'pre_agp0'
+                MDFillRoundFlatIconButton:
+                    text: "AGP0"
+                    icon: "file-document-edit"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'agp0'
+                MDFillRoundFlatIconButton:
+                    text: "Info"
+                    icon: "information-outline"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: root.manager.current = 'info'
+                MDFillRoundFlatIconButton:
+                    text: "Exit"
+                    icon: "exit-run"
+                    size_hint: 1, None
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    theme_icon_color: "Custom"
+                    icon_color: 1,0,0,.6
+                    font_style: "Subtitle1"
+                    md_bg_color: "white"
+                    on_press: app.stop()
+            MDBoxLayout:
+
+
+<EA_Screen>:
+    name: "early_engagment"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 150
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './data/kivymd/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Input an Operation Plan"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "File"
+                            icon: "file"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: app.prompt_path_to_current_op()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Start Generation"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Generate"
+                            icon: "fountain-pen-tip"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: app.show_dialog()
+                            on_release: app.run_early_engagement_module()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Check Archive"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Open Archive"
+                            icon: "folder"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press:  app.open_early_engagement_archive()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Return to Home"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Return"
+                            icon: "home"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: root.manager.current = 'main'
+
+<Pre_AGP0_Screen>:
+    name: "pre_agp0"
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 150
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './data/kivymd/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Input an Assessment file"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "File"
+                            icon: "file"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: app.prompt_path_to_risk_assessment()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Start Generation"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Generate"
+                            icon: "fountain-pen-tip"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_release: app.run_pre_agp0_module()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Check Output"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Open Output"
+                            icon: "folder"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press:  app.open_pre_agp0_output()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Return to Home"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Return"
+                            icon: "home"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: root.manager.current = 'main'
+
+
+<AGP0_Screen>:
+    name: "agp0"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 150
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './data/kivymd/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Input an AGP0 zip file"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "File"
+                            icon: "file"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: app.prompt_path_to_agp0_zip()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Start Checking"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Check"
+                            icon: "fountain-pen-tip"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_release: app.run_agp0_module()
+            MDBoxLayout:
+                MDBoxLayout:
+                    padding: 10
+                    MDLabel:
+                        text: "Return to Home"
+                        halign: "left"
+                        color: 1,0,0,.6
+                    MDBoxLayout:
+                        MDFillRoundFlatIconButton:
+                            text: "Return"
+                            icon: "home"
+                            theme_text_color: "Custom"
+                            text_color: "white"
+                            theme_icon_color: "Custom"
+                            icon_color: "white"
+                            font_style: "Subtitle1"
+                            md_bg_color: 1,0,0,.3
+                            on_press: root.manager.current = 'main'
+
+<Info_Screen>:
+    name: "info"
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 50
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './data/kivymd/background.jpg'
+        MDCard:
+            padding: 50
+            spacing: 10
+            elevation: 3
+            radius: [12,]
+            orientation: 'vertical'
+            MDBoxLayout:
+                size_hint: 1, 0.5
+                MDLabel:
+                    text:"AIRE version 3"
+                    halign: "center"
+                    theme_text_color: "Custom"
+                    text_color: 1,0,0,.6
+                    font_style: "H5"
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 3
+                MDBoxLayout:
+                    md_bg_color: 1,0,0,.1
+                    radius: [12,]
+                    MDLabel: 
+                        text: "Functions"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                MDBoxLayout:
+                    MDLabel: 
+                        text: "Early Engagement"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        size_hint: 3, 1
+                        text: "Generate intake forms based on an operational plan file"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                MDBoxLayout:
+                    MDLabel: 
+                        text: "Pre AGP0"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        size_hint: 3, 1
+                        text: "Generate a risk assessment Word report based on a risk assessment Excel file"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                MDBoxLayout:
+                    MDLabel: 
+                        text: "AGP0"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        size_hint: 3, 1
+                        text: "Check requirements of AGP0"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 1.5
+                MDBoxLayout:
+                    md_bg_color: 1,0,0,.1
+                    radius: [12,]
+                    MDLabel: 
+                        text: "Developers"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                MDBoxLayout:
+                    MDLabel: 
+                        text: "Arielle Ramgoolie"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Abdullahi Hassan"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Dongwon Lee"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6
+                    MDLabel: 
+                        text: "Mohammed Sohail"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6            
+                    MDLabel: 
+                        text: "Nour Badiri"
+                        theme_text_color: "Custom"
+                        text_color: 1,0,0,.6      
+            MDBoxLayout:
+                MDBoxLayout:
+                    size_hint: 0.2, 0.5
+                    pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                    MDFillRoundFlatIconButton:
+                        text: "Return"
+                        icon: "home"
+                        size: self.parent.size
+                        pos_hint: { "center_x": 0.5, "center_y": 0.5 }
+                        theme_text_color: "Custom"
+                        text_color: "white"
+                        theme_icon_color: "Custom"
+                        icon_color: "white"
+                        font_style: "Subtitle1"
+                        md_bg_color: 1,0,0,.3
+                        on_press: root.manager.current = 'main'
+                MDBoxLayout:
