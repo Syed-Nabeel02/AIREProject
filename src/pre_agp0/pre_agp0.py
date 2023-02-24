@@ -6,36 +6,13 @@ from pathlib import Path
 import openpyxl
 from difflib import SequenceMatcher
 
-"""
-Pre-AGP0: Creates a report Word file based on a rubric Excel file. 
-
-Methods
-----------
-run(initiative_name, assessment_file_directory) -> None
-
-generate_pre_agp_0_report(initiative_name, assessment_file_directory) -> None
-
-get_assessment_data(assessment_file_directory) -> list
-split_assessment_data(assessment_data) -> tuple
-
-get_similarity(rubric_text: str, rationale_text: str) -> float
-get_rubric_descriptions() -> list
-get_today_date_time() -> datetime
-get_risk_level(risk_score: int) -> str
-get_attribute_score(attribute_level: str) -> int
-generate_output_folder() -> None
-generate_template(output_template_name: str) -> DocxTemplate
-save_output(doc: DocxTemplate) -> None
-open_output_file() -> None
-fill_in_template(initiative_name: str, attribute_levels: list, risk_score: int, rationales: list, corporate_or_cluster: str) -> None
-"""
 path_to_output = Path().absolute() / 'data' / 'output' / 'pre_agp0' 
 path_to_template = Path().absolute() / 'data' / 'input' / 'pre_agp0' / "Architecture Intake Review Engine Report Draft.docx"
 path_to_rubric = Path().absolute() / 'data' / 'input' / 'pre_agp0' / "IIT-EA-Decision-Matrix.xlsx"
 
 def run(initiative_name: str, assessment_file_directory: str) -> None:
     """
-    Does the magic
+    entry function of pre_agp0 module
 
     Parameters
     ----------
@@ -137,7 +114,7 @@ def generate_template() -> DocxTemplate:
 
 def get_similarity(rubric_text: str, rationale_text: str) -> float:
     """
-    Get the text similarity ratio between the rubric text and input text
+    Calcualte the text similarity ratio between the rubric text and input text
     """
     return SequenceMatcher(None, rubric_text, rationale_text).ratio()
 

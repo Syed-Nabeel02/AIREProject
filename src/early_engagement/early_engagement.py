@@ -16,10 +16,11 @@ from concurrent.futures import ThreadPoolExecutor
 # shutil: shell utilities
 # os: operating system
 
-class early_engagement():
+class EarlyEngagement:
 
-    path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'EA Engagement Self-Assessment Template v0.6.docx'
+
     path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement' 
+    path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'EA Engagement Self-Assessment Template v0.6.docx'
     path_to_intake_form_folder = Path().absolute() / 'data' / 'output' / 'early_engagement' / 'intake forms'
     path_to_archive = Path().absolute() / 'data' / 'archive' / 'early_engagement'
 
@@ -316,6 +317,6 @@ if __name__ == '__main__':
     path_to_changed_op = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'CYSSC FY 2022-23 Operational Plan - PUBLISHED June 2022 - old.xlsx'
     
     try:
-        early_engagement(path_to_current_op).check_first_run().add_previous_op_to_output_folder().compare_current_previous_op().generate_comparison_report().generate_comparison_tables().generate_intake_forms().archive_files().clear_output_folder()
+        EarlyEngagement(path_to_current_op).check_first_run().add_previous_op_to_output_folder().compare_current_previous_op().generate_comparison_report().generate_comparison_tables().generate_intake_forms().archive_files().clear_output_folder()
     except Exception as e:
         print(e)
