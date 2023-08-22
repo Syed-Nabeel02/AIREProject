@@ -7,9 +7,9 @@ import os
 from datetime import datetime
 
 # Define the paths to the operational plan, intake form template, and output directory
-path_to_operational_plan = 'new_operational_plan.xlsx'
+path_to_operational_plan = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'new_operational_plan.xlsx'
 path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'new_intake_form.docx'
-path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement_test' 
+path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement' 
 
 def main():
     # Process the operational plan data, fill the template with the data, and save the generated names
