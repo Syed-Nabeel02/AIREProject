@@ -1,15 +1,18 @@
 import pandas as pd
 from docx import Document
+from pathlib import Path
+import os
+
+new_file = Path().absolute() / 'data' / 'input' / 'compare_operational_plans' / 'new_operational_plan.xlsx'
+old_file = Path().absolute() / 'data' / 'input' / 'compare_operational_plans' / 'new_operational_plan_old.xlsx'
+output_file = Path().absolute() / 'data' / 'output' / 'compare_operational_plans' / 'Operational Plan Comparison Report.docx'
+path_to_output = Path().absolute() / 'data' / 'output' / 'compare_operational_plans'
 
 def main():
-    # File paths for the new and old operational plans and the output report
-    new_file = 'new_operational_plan.xlsx'
-    old_file = 'new_operational_plan_old.xlsx'
-    output_file = 'Operational Plan Comparison Report.docx'
-
     print(f"Comparing {new_file} with {old_file}...")
     # Start the comparison process
     compare_excels(new_file, old_file, output_file)
+    open_output_folder();
 
 def read_excel(file_path):
     # Reads an Excel file and returns a DataFrame
@@ -27,7 +30,7 @@ def get_changes(row_new, row_old):
 # Following functions are responsible for writing different sections of the comparison report
 def write_modified_items(doc, modified_items):
     # Writes modified items to the Word document
-    doc.add_heading('Comparison', level=2)
+    doc.add_heading('1. Modified Items', level=2)
     doc.add_paragraph(f'Number of Modified Items: {len(modified_items)}')
     for index, item in enumerate(modified_items, start=1):
         para = doc.add_paragraph()
@@ -39,14 +42,14 @@ def write_modified_items(doc, modified_items):
 
 def write_new_items(doc, new_items):
     # Writes new items to the Word document
-    doc.add_heading('New Items', level=2)
+    doc.add_heading('2. New Items', level=2)
     doc.add_paragraph(f'Number of New Items: {len(new_items)}')
     for index, (item_id, item_name) in enumerate(new_items, start=1):
         doc.add_paragraph(f"{index}. New Item: ({item_id}) {item_name}")
 
 def write_deleted_items(doc, deleted_items):
     # Writes deleted items to the Word document
-    doc.add_heading('Deleted Items', level=2)
+    doc.add_heading('3. Deleted Items', level=2)
     doc.add_paragraph(f'Number of Deleted Items: {len(deleted_items)}')
     for index, (item_id, item_name) in enumerate(deleted_items, start=1):
         doc.add_paragraph(f"{index}. Deleted Item: ({item_id}) {item_name}")
@@ -62,6 +65,9 @@ def compare_excels(new_file, old_file, output_file):
     # Read Excel files
     df_new = read_excel(new_file)
     df_old = read_excel(old_file)
+
+    # Create the directory if it does not exist
+    output_file.parent.mkdir(parents=True, exist_ok=True)
 
     doc = Document()
     doc.add_heading('Operational Plan Comparison Report', level=1)
@@ -108,6 +114,9 @@ def process_items(df_new, df_old):
             deleted_items.append((item_id, item_name))
 
     return modified_items, new_items, deleted_items
+
+def open_output_folder() -> None:
+    os.startfile(str(path_to_output))
 
 if __name__ == "__main__":
     main()

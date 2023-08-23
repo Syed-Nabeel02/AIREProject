@@ -1,6 +1,9 @@
 import zipfile
+from pathlib import Path
 
-def main(agp0_submission_path: str) -> None:
+agp0_submission_path = Path().absolute() / 'data' / 'input' / 'check_agp0_requirements' / 'AGP0.zip'
+
+def main():
     # Generate a report based on the contents of the provided ZIP file
     generate_agp_0_report(agp0_submission_path)
 
@@ -65,6 +68,4 @@ def organize_files_by_type(file_names: list) -> tuple:
     return (word_file_names, excel_file_names, ppt_file_names, pdf_file_names)
 
 if __name__ == "__main__":
-    # Path to the ZIP file
-    agp0_submission_path = "AGP0.zip"
-    main(agp0_submission_path)
+    main()

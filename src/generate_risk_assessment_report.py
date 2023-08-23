@@ -6,12 +6,12 @@ from pathlib import Path
 import openpyxl
 from difflib import SequenceMatcher
 
-path_to_output = Path().absolute() / 'data' / 'output' / 'pre_agp0' 
-path_to_template = Path().absolute() / 'data' / 'input' / 'pre_agp0' / "Architecture Intake Review Engine Report Draft.docx"
-path_to_rubric = Path().absolute() / 'data' / 'input' / 'pre_agp0' / "IIT-EA-Decision-Matrix.xlsx"
+path_to_output = Path().absolute() / 'data' / 'output' / 'generate_risk_assessment_report' 
+path_to_template = Path().absolute() / 'data' / 'input' / 'generate_risk_assessment_report' / "Architecture Intake Review Engine Report Draft.docx"
+path_to_rubric = Path().absolute() / 'data' / 'input' / 'generate_risk_assessment_report' / "IIT-EA-Decision-Matrix.xlsx"
 
 def main() -> None:
-    generate_pre_agp_0_report("C:\AIRE\data\input\pre_agp0\sample_assessment.xlsx")
+    generate_pre_agp_0_report("C:\AIRE\data\input\generate_risk_assessment_report\sample_assessment.xlsx")
 
 def generate_pre_agp_0_report(assessment_file_directory) -> None:
     
@@ -150,6 +150,9 @@ def get_attribute_score(attribute_level: str) -> int:
         return 2
 
 def save_output(doc: DocxTemplate) -> None:
+    # Ensure the output directory exists
+    if not path_to_output.exists():
+        path_to_output.mkdir(parents=True, exist_ok=True)
     doc.save(path_to_output / "Assessment_Report.docx")
 
 def open_output_file() -> None:

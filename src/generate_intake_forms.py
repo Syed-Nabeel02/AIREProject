@@ -7,15 +7,16 @@ import os
 from datetime import datetime
 
 # Define the paths to the operational plan, intake form template, and output directory
-path_to_operational_plan = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'new_operational_plan.xlsx'
-path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'early_engagement' / 'new_intake_form.docx'
-path_to_output = Path().absolute() / 'data' / 'output' / 'early_engagement' 
+path_to_operational_plan = Path().absolute() / 'data' / 'input' / 'generate_intake_forms' / 'new_operational_plan.xlsx'
+path_to_intake_form_template = Path().absolute() / 'data' / 'input' / 'generate_intake_forms' / 'new_intake_form.docx'
+path_to_output = Path().absolute() / 'data' / 'output' / 'generate_intake_forms' 
 
 def main():
     # Process the operational plan data, fill the template with the data, and save the generated names
     data_list = process_operational_plan_data()
     generated_names = fill_template(data_list)
     save_generated_names_to_file(generated_names)
+    open_output_folder()
 
 def process_operational_plan_data():
     # Read the operational plan Excel file
@@ -116,6 +117,9 @@ def save_generated_names_to_file(generated_names):
     output_file_path = path_to_output / "generated_names_list.docx"
     output_doc.save(output_file_path)
     print("Generated names list saved to", output_file_path)
+
+def open_output_folder() -> None:
+    os.startfile(str(path_to_output))
 
 if __name__ == "__main__":
     main()
